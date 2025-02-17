@@ -1,11 +1,11 @@
-import { useState } from "react";
-
+import { ReactElement } from "react";
 import "./App.css";
+import { TableDetections } from "./components/TableDetections";
 
-function App(): React.ReactElement {
+function App(): ReactElement {
   return (
     <div>
-      <div className="uppercase text-5xl text-cyan-600">test</div>
+      <TableDetections />
     </div>
   );
 }
