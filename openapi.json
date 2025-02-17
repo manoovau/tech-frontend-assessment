@@ -1,0 +1,206 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0",
+    "title": "Heyering API 1.0",
+    "description": "This OpenAPI file contains the specification of the Heyering API for use in the tech assessment. The API is available on \"https://api.heyering.com/<endpoint>\"."
+  },
+  "externalDocs": {
+    "description": "Find out more about jobs at Eye Security",
+    "url": "http://jobs.eye.security/"
+  },
+  "servers": [
+    {
+      "url": "https://api.heyering.com/"
+    }
+  ],
+  "security": [
+    {
+      "APIKeyHeader": []
+    }
+  ],
+  "paths": {
+    "/ca6b7066/docs": {
+      "get": {
+        "summary": "Serve API documentation",
+        "responses": {
+          "200": {
+            "description": "HTML documentation",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detections": {
+      "get": {
+        "summary": "Get detections",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "description": "0-based page index",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "amount of items. Max 100 detections can be requested",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of detections",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "primary id (uuid)"
+                      },
+                      "eyed": {
+                        "type": "string",
+                        "description": "Internal identifier of a customer company/organization",
+                        "example": "EyeD-3890128301"
+                      },
+                      "status": {
+                        "type": "string",
+                        "description": "status of the detection. All detections go through the same stages. A detection will be acknowledged when the security analyst is performing triage. A detection will be resolved after triage is done.",
+                        "enum": [
+                          "triggered",
+                          "acknowledged",
+                          "resolved"
+                        ]
+                      },
+                      "resolutionStatus": {
+                        "type": "string",
+                        "description": "resolution status of the detection. If there was malicious action, the resolution status is TP.",
+                        "enum": [
+                          "TP",
+                          "FP"
+                        ]
+                      },
+                      "service": {
+                        "type": "string",
+                        "description": "the security vendor that generated the detection",
+                        "enum": [
+                          "mcafee",
+                          "norton_antivirus",
+                          "defender_for_endpoint",
+                          "sentinel"
+                        ]
+                      },
+                      "title": {
+                        "type": "string",
+                        "description": "Title of the detection",
+                        "example": "Disable or Modify Tools - dllhost.exe"
+                      },
+                      "severity": {
+                        "description": "Severity of the detection",
+                        "type": "string",
+                        "enum": [
+                          "low",
+                          "high"
+                        ]
+                      },
+                      "createdAt": {
+                        "description": "Timestamp of creation in our detections-service",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T00:00:00Z"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T01:00:00Z"
+                      },
+                      "triggeredAt": {
+                        "description": "Timestamp of creation in the vendor (e.g. McAfee)",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T00:05:00Z"
+                      },
+                      "acknowledgedAt": {
+                        "description": "Timestamp of acknowledgement by security analyst",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T01:30:00Z"
+                      },
+                      "acknowledgedBy": {
+                        "description": "Email of security analyst",
+                        "type": "string",
+                        "example": "gandalf@eye.security"
+                      },
+                      "resolvedAt": {
+                        "description": "Timestamp of resolve by security analyst",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-02T00:00:00Z"
+                      },
+                      "resolvedBy": {
+                        "description": "Email of security analyst",
+                        "type": "string",
+                        "example": "frodo@eye.security"
+                      },
+                      "categoryRef": {
+                        "description": "Category of a detection",
+                        "type": "string",
+                        "enum": [
+                          "malicious_behavior_on_a_system",
+                          "unusual_login_or_user_activity",
+                          "execution_with_malicious_intent",
+                          "unusual_software_activity",
+                          "unauthorized_data_access",
+                          "uncategorized"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "429": {
+            "description": "Rate limit, remain your calm"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "APIKeyHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    }
+  }
+}
