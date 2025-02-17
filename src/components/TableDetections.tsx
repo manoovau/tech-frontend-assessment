@@ -8,6 +8,7 @@ import {
 } from "../types";
 import { mockDetections } from "../data";
 import { useDebounce } from "use-debounce";
+import { DateELement } from "./DateElement";
 
 const DETECTIONS_STATUS_OPTIONS: DetectionStatus[] = [
   "acknowledged",
@@ -181,11 +182,8 @@ export const TableDetections = (): ReactElement => {
           value={days}
           onChange={(e: ChangeEvent<HTMLInputElement>) => onChangeDaysValue(e)}
           aria-label="Days input"
-          // className={daysError ? "error-input" : ""}
           placeholder="Enter days"
           maxLength={MAX_DAYS_DIGITS}
-          // onFocus={() => setFocusedDays(true)}
-          // onBlur={() => setFocusedDays(false)}
         />
       </div>
 
@@ -261,7 +259,9 @@ export const TableDetections = (): ReactElement => {
               <th className="px-4 py-2 border">ID</th>
               <th className="px-4 py-2 border">Eyed</th>
               <th className="px-4 py-2 border">Status</th>
-              <th className="px-4 py-2 border">Resolution Status</th>
+              <th className="px-4 py-2 border">
+                Resolution <br /> Status
+              </th>
               <th className="px-4 py-2 border">Service</th>
               <th className="px-4 py-2 border">Title</th>
               <th className="px-4 py-2 border">Severity</th>
@@ -288,49 +288,52 @@ export const TableDetections = (): ReactElement => {
                 <td className="px-4 py-2 border">{item.severity}</td>
                 {item?.createdAt ? (
                   <td className="px-4 py-2 border">
-                    {new Date(item?.createdAt).toLocaleDateString()} <br />
-                    {new Date(item?.createdAt).toLocaleTimeString()}
+                    <DateELement
+                      date={item?.createdAt}
+                      isContactEmail={false}
+                    />
                   </td>
                 ) : (
                   <td className="px-4 py-2 border"></td>
                 )}
                 {item?.updatedAt ? (
                   <td className="px-4 py-2 border">
-                    {new Date(item?.updatedAt).toLocaleDateString()} <br />
-                    {new Date(item?.updatedAt).toLocaleTimeString()}
+                    <DateELement
+                      date={item?.updatedAt}
+                      isContactEmail={false}
+                    />
                   </td>
                 ) : (
                   <td className="px-4 py-2 border"></td>
                 )}
                 {item?.triggeredAt ? (
                   <td className="px-4 py-2 border">
-                    {new Date(item?.triggeredAt).toLocaleDateString()} <br />
-                    {new Date(item?.triggeredAt).toLocaleTimeString()}
+                    <DateELement
+                      date={item?.triggeredAt}
+                      isContactEmail={false}
+                    />
                   </td>
                 ) : (
                   <td className="px-4 py-2 border"></td>
                 )}
                 <td className="px-4 py-2 border">
-                  {item?.acknowledgedAt && (
-                    <>
-                      {new Date(item?.acknowledgedAt).toLocaleDateString()}{" "}
-                      {" - "}
-                      {new Date(item?.acknowledgedAt).toLocaleTimeString()}
-                      {item?.acknowledgedBy && <br />}
-                    </>
+                  {item.acknowledgedAt && (
+                    <DateELement
+                      date={item?.acknowledgedAt}
+                      isContactEmail={true}
+                      contactEmail={item?.acknowledgedBy}
+                    />
                   )}
-                  {item?.acknowledgedBy && item?.acknowledgedBy}
                 </td>
 
                 <td className="px-4 py-2 border">
-                  {item?.resolvedAt && (
-                    <>
-                      {new Date(item?.resolvedAt).toLocaleDateString()} {" - "}
-                      {new Date(item?.resolvedAt).toLocaleTimeString()}
-                      {item?.resolvedBy && <br />}
-                    </>
+                  {item.resolvedAt && (
+                    <DateELement
+                      date={item?.resolvedAt}
+                      isContactEmail={true}
+                      contactEmail={item?.resolvedBy}
+                    />
                   )}
-                  {item?.acknowledgedBy && item?.acknowledgedBy}
                 </td>
                 <td className="px-4 py-2 border">{item.categoryRef}</td>
               </tr>

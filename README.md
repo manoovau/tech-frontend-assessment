@@ -2,6 +2,13 @@
 
 Project: Detections table.
 
+## To Do:
+
+- Add Pagination component
+- Add date cell component
+- Use day input in my request
+- Add Category Ref filter (maybe SELECT?)
+
 ## Project features:
 
 - To customize the data displayed in the table, you can use the available filters and Search element.
