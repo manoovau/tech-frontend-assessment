@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, useMemo, ReactElement } from "react";
+import { useState, ChangeEvent, useMemo, ReactElement, useEffect } from "react";
 import {
   DetectionStatus,
   Detection,
@@ -33,26 +33,28 @@ const DETECTIONS_CATEGORY_REF_OPTIONS: DetectionCategoryRef[] = [
 ];
 
 export const TableDetections = (): ReactElement => {
+  const [apiResponse, setApiResponse] = useState<Detection[]>([]);
   const [searchString, setSearchString] = useState<string>("");
   const [searchStringDebounced] = useDebounce(searchString, 300);
-  // add this value inside API url
-  const [days, setDays] = useState<string>("");
 
-  const MAX_DAYS_DIGITS = 4;
+  const [apiError, setApiError] = useState(false);
 
-  const onChangeDaysValue = (e: ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value;
-
-    // Remove non-numeric characters
-    value = value.replace(/\D/g, "");
-
-    // Limit length to MAX_DAYS_DIGITS characters
-    if (value.length > MAX_DAYS_DIGITS) {
-      value = value.slice(0, MAX_DAYS_DIGITS);
-    }
-
-    setDays(value);
-  };
+  const T_HEAD = [
+    "Eyed",
+    "Status",
+    `Resolution Status`,
+    "Service",
+    "Title",
+    "Severity",
+    "Created At",
+    "Updated At",
+    "Triggered At",
+    "Acknowledged",
+    "Resolved",
+    "Category Ref",
+  ];
+  const API_LIMIT = 20;
+  const API_PAGE = 0;
 
   const [detectionStatusFilter, setDetectionStatusFilter] = useState<
     Record<DetectionStatus, boolean>
@@ -120,12 +122,45 @@ export const TableDetections = (): ReactElement => {
     }));
   };
 
+  useEffect(() => {
+    const fetchDetections = async () => {
+      const url = `/api/detections?page=${API_PAGE}0&limit=${API_LIMIT}`;
+
+      try {
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            Authorization: "eye-am-hiring",
+            Accept: "application/json",
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+          setApiError(true);
+        }
+
+        const data = await response.json();
+        setApiResponse(data);
+
+        return data;
+      } catch (error) {
+        console.error("Error fetching detections:", error);
+        setApiError(true);
+        return [];
+      }
+    };
+
+    fetchDetections();
+  }, []);
+
   const result = useMemo(() => {
     const searchStringDebouncedLowerCase = searchStringDebounced.toLowerCase();
-    return mockDetections
+    const dataToFilter =
+      apiResponse.length !== 0 ? apiResponse : mockDetections; // Default to mockDetections if API error
+
+    return dataToFilter
       .filter(
         (item: Detection) =>
-          item.id?.toLowerCase().includes(searchStringDebouncedLowerCase) ||
           item.eyed?.toLowerCase().includes(searchStringDebouncedLowerCase) ||
           item.title?.toLowerCase().includes(searchStringDebouncedLowerCase) ||
           item.acknowledgedBy
@@ -161,185 +196,191 @@ export const TableDetections = (): ReactElement => {
     detectionResolutionStatusFilter,
     detectionSeverityFilter,
     detectionCategoryRefFilter,
+    apiResponse,
   ]);
 
   return (
     <div>
-      <h3>Table Detections</h3>
-      <div className="form-control self-center">
-        <input
-          type="text"
-          placeholder="Search"
-          className="input input-bordered w-24 md:w-auto"
-          value={searchString}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setSearchString(e.target.value)
-          }
-        />
-        <input
-          id="days"
-          type="text"
-          value={days}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => onChangeDaysValue(e)}
-          aria-label="Days input"
-          placeholder="Enter days"
-          maxLength={MAX_DAYS_DIGITS}
-        />
-      </div>
-
-      <div id="status-filter" className="m-2 flex">
-        {DETECTIONS_STATUS_OPTIONS.map((item) => (
-          <div key={item}>
-            {" "}
+      <h1>Table Detections</h1>
+      <div className="flex flex-row">
+        <div>
+          <div className="form-control self-center">
             <input
-              type="checkbox"
-              className="mr-2"
-              checked={detectionStatusFilter[item]}
-              onChange={() => onChangeStatusFilter(item)}
+              type="text"
+              placeholder="Search"
+              className="input input-bordered w-24 md:w-auto"
+              value={searchString}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setSearchString(e.target.value)
+              }
             />
-            <label htmlFor={`${item}`} className="mr-2">
-              {`${item}`}
-            </label>
           </div>
-        ))}
-      </div>
-      <div id="status-resolution-filter" className="m-2 flex">
-        {" "}
-        {DETECTIONS_RESOLUTION_STATUS_OPTIONS.map((item) => (
-          <div key={item}>
-            {" "}
-            <input
-              type="checkbox"
-              className="mr-2"
-              checked={detectionResolutionStatusFilter[item]}
-              onChange={() => onChangeStatusResolutionFilter(item)}
-            />
-            <label htmlFor={`${item}`} className="mr-2">
-              {`${item}`}
-            </label>
+          <div>
+            <div>
+              <h3>Status </h3>
+            </div>
+            <div id="status-filter" className="m-2 flex flex-col">
+              {DETECTIONS_STATUS_OPTIONS.map((item) => (
+                <div key={item}>
+                  {" "}
+                  <input
+                    type="checkbox"
+                    className="mr-2"
+                    checked={detectionStatusFilter[item]}
+                    onChange={() => onChangeStatusFilter(item)}
+                  />
+                  <label htmlFor={`${item}`} className="mr-2">
+                    {`${item}`}
+                  </label>
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
-      </div>
-      <div id="severity-filter" className="m-2 flex">
-        {DETECTIONS_SEVERITY_OPTIONS.map((item) => (
-          <div key={item}>
-            {" "}
-            <input
-              type="checkbox"
-              className="mr-2"
-              checked={detectionSeverityFilter[item]}
-              onChange={() => onChangeSeverityFilter(item)}
-            />
-            <label htmlFor={`${item}`} className="mr-2">
-              {`${item}`}
-            </label>
+          <div>
+            <div>
+              <h3>Resoluton Status</h3>
+            </div>
+            <div id="status-resolution-filter" className="m-2 flex flex-col">
+              {" "}
+              {DETECTIONS_RESOLUTION_STATUS_OPTIONS.map((item) => (
+                <div key={item}>
+                  {" "}
+                  <input
+                    type="checkbox"
+                    className="mr-2"
+                    checked={detectionResolutionStatusFilter[item]}
+                    onChange={() => onChangeStatusResolutionFilter(item)}
+                  />
+                  <label htmlFor={`${item}`} className="mr-2">
+                    {`${item}`}
+                  </label>
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
-      </div>
-      <div id="category-ref-filter" className="m-2 flex">
-        {DETECTIONS_CATEGORY_REF_OPTIONS.map((item) => (
-          <div key={item}>
-            {" "}
-            <input
-              type="checkbox"
-              className="mr-2"
-              checked={detectionCategoryRefFilter[item]}
-              onChange={() => onChangeCategoryRefFilter(item)}
-            />
-            <label htmlFor={`${item}`} className="mr-2">
-              {`${item}`}
-            </label>
+          <div>
+            <div>
+              <h3>Severity</h3>
+            </div>
+            <div id="severity-filter" className="m-2 flex flex-col">
+              {DETECTIONS_SEVERITY_OPTIONS.map((item) => (
+                <div key={item}>
+                  {" "}
+                  <input
+                    type="checkbox"
+                    className="mr-2"
+                    checked={detectionSeverityFilter[item]}
+                    onChange={() => onChangeSeverityFilter(item)}
+                  />
+                  <label htmlFor={`${item}`} className="mr-2">
+                    {`${item}`}
+                  </label>
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
-      </div>
-      <div className="overflow-x-auto border-1">
-        <table className="w-full border-collapse border border-gray-200 shadow-lg rounded-lg">
-          <thead className="bg-gray-100 text-gray-700 uppercase text-sm">
-            <tr>
-              <th className="px-4 py-2 border">ID</th>
-              <th className="px-4 py-2 border">Eyed</th>
-              <th className="px-4 py-2 border">Status</th>
-              <th className="px-4 py-2 border">
-                Resolution <br /> Status
-              </th>
-              <th className="px-4 py-2 border">Service</th>
-              <th className="px-4 py-2 border">Title</th>
-              <th className="px-4 py-2 border">Severity</th>
-              <th className="px-4 py-2 border">Created At</th>
-              <th className="px-4 py-2 border">Updated At</th>
-              <th className="px-4 py-2 border">Triggered At</th>
-              <th className="px-4 py-2 border">Acknowledged</th>
-              <th className="px-4 py-2 border">Resolved</th>
-              <th className="px-4 py-2 border">Category Ref</th>
-            </tr>
-          </thead>
-          <tbody className="text-gray-600 text-sm">
-            {result.map((item) => (
-              <tr
-                key={item.id}
-                className="border hover:bg-gray-50 even:bg-gray-50 transition-all"
-              >
-                <td className="px-4 py-2 border">{item.id}</td>
-                <td className="px-4 py-2 border">{item.eyed}</td>
-                <td className="px-4 py-2 border">{item.status}</td>
-                <td className="px-4 py-2 border">{item.resolutionStatus}</td>
-                <td className="px-4 py-2 border">{item.service}</td>
-                <td className="px-4 py-2 border">{item.title}</td>
-                <td className="px-4 py-2 border">{item.severity}</td>
-                {item?.createdAt ? (
-                  <td className="px-4 py-2 border">
-                    <DateELement
-                      date={item?.createdAt}
-                      isContactEmail={false}
-                    />
-                  </td>
-                ) : (
-                  <td className="px-4 py-2 border"></td>
-                )}
-                {item?.updatedAt ? (
-                  <td className="px-4 py-2 border">
-                    <DateELement
-                      date={item?.updatedAt}
-                      isContactEmail={false}
-                    />
-                  </td>
-                ) : (
-                  <td className="px-4 py-2 border"></td>
-                )}
-                {item?.triggeredAt ? (
-                  <td className="px-4 py-2 border">
-                    <DateELement
-                      date={item?.triggeredAt}
-                      isContactEmail={false}
-                    />
-                  </td>
-                ) : (
-                  <td className="px-4 py-2 border"></td>
-                )}
-                <td className="px-4 py-2 border">
-                  {item.acknowledgedAt && (
-                    <DateELement
-                      date={item?.acknowledgedAt}
-                      isContactEmail={true}
-                      contactEmail={item?.acknowledgedBy}
-                    />
-                  )}
-                </td>
-
-                <td className="px-4 py-2 border">
-                  {item.resolvedAt && (
-                    <DateELement
-                      date={item?.resolvedAt}
-                      isContactEmail={true}
-                      contactEmail={item?.resolvedBy}
-                    />
-                  )}
-                </td>
-                <td className="px-4 py-2 border">{item.categoryRef}</td>
+          <div>
+            <div>
+              <h3>Resoluton Status</h3>
+            </div>
+            <div id="category-ref-filter" className="m-2 flex flex-col">
+              {DETECTIONS_CATEGORY_REF_OPTIONS.map((item) => (
+                <div key={item}>
+                  {" "}
+                  <input
+                    type="checkbox"
+                    className="mr-2"
+                    checked={detectionCategoryRefFilter[item]}
+                    onChange={() => onChangeCategoryRefFilter(item)}
+                  />
+                  <label htmlFor={`${item}`} className="mr-2">
+                    {`${item}`}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="overflow-x-auto border-1">
+          {apiResponse.length === 0 && !apiError && <h3>Loading ....</h3>}
+          {apiError && apiResponse.length === 0 && <h3>Mock API</h3>}
+          <table className="w-full border-collapse border border-gray-200 shadow-lg rounded-lg">
+            <thead className="bg-gray-100 text-gray-700 uppercase text-sm">
+              <tr>
+                {T_HEAD.map((item) => (
+                  <th key={item} className="px-4 py-2 border">
+                    {item}
+                  </th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="text-gray-600 text-sm">
+              {result.map((item) => (
+                <tr
+                  key={item.id}
+                  className="border hover:bg-gray-50 even:bg-gray-50 transition-all"
+                >
+                  <td className="px-4 py-2 border">{item.eyed}</td>
+                  <td className="px-4 py-2 border">{item.status}</td>
+                  <td className="px-4 py-2 border">{item.resolutionStatus}</td>
+                  <td className="px-4 py-2 border">{item.service}</td>
+                  <td className="px-4 py-2 border">{item.title}</td>
+                  <td className="px-4 py-2 border">{item.severity}</td>
+                  {item?.createdAt ? (
+                    <td className="px-4 py-2 border">
+                      <DateELement
+                        date={item?.createdAt}
+                        isContactEmail={false}
+                      />
+                    </td>
+                  ) : (
+                    <td className="px-4 py-2 border"></td>
+                  )}
+                  {item?.updatedAt ? (
+                    <td className="px-4 py-2 border">
+                      <DateELement
+                        date={item?.updatedAt}
+                        isContactEmail={false}
+                      />
+                    </td>
+                  ) : (
+                    <td className="px-4 py-2 border"></td>
+                  )}
+                  {item?.triggeredAt ? (
+                    <td className="px-4 py-2 border">
+                      <DateELement
+                        date={item?.triggeredAt}
+                        isContactEmail={false}
+                      />
+                    </td>
+                  ) : (
+                    <td className="px-4 py-2 border"></td>
+                  )}
+                  <td className="px-4 py-2 border">
+                    {item.acknowledgedAt && (
+                      <DateELement
+                        date={item?.acknowledgedAt}
+                        isContactEmail={true}
+                        contactEmail={item?.acknowledgedBy}
+                      />
+                    )}
+                  </td>
+
+                  <td className="px-4 py-2 border">
+                    {item.resolvedAt && (
+                      <DateELement
+                        date={item?.resolvedAt}
+                        isContactEmail={true}
+                        contactEmail={item?.resolvedBy}
+                      />
+                    )}
+                  </td>
+                  <td className="px-4 py-2 border">{item.categoryRef}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

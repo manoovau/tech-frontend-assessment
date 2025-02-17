@@ -1,4 +1,4 @@
-# Detections table
+# Detections tablex
 
 Project: Detections table.
 
@@ -17,6 +17,13 @@ Project: Detections table.
 - Maximum Days Limit: The input allows a maximum of 4 digits (up to 9,999 days, which is approximately 27 years and 4 months).
 
 ## Comments
+
+- Set API limit to 20 and API page to 0. These values can be updated using the constants: "API_LIMIT" and "API_PAGE".
+- Set Mocker Detections when API is not working.
+- Future implementation:
+  - Add an input to filter and display data from the last 24 hours, last week, or last month.
+  - Sort Values
+  - Pagination (API limit = 100)
 
 ## Clone project.
 

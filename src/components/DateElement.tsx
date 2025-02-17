@@ -9,9 +9,6 @@ type Props = {
 export const DateELement = (props: Props): ReactElement => {
   const { date, isContactEmail, contactEmail } = props;
 
-  console.log("Date Element");
-  console.log(date);
-
   const dateFormated = date.split("T");
   const timeData = dateFormated[1];
   const timeFormated = timeData.split(".");
@@ -20,7 +17,7 @@ export const DateELement = (props: Props): ReactElement => {
     <div>
       {isContactEmail ? (
         <div>
-          {dateFormated[0]} {" - "}
+          {dateFormated[0]} {"; "}
           {timeFormated[0]} <br />
           {contactEmail}
         </div>
