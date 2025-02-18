@@ -9,6 +9,7 @@ import {
 import { mockDetections } from "../data";
 import { useDebounce } from "use-debounce";
 import { DateELement } from "./DateElement";
+import { AUTHORIZATION } from "../authentication/credentials";
 
 const DETECTIONS_STATUS_OPTIONS: DetectionStatus[] = [
   "acknowledged",
@@ -130,13 +131,13 @@ export const TableDetections = (): ReactElement => {
         const response = await fetch(url, {
           method: "GET",
           headers: {
-            Authorization: "eye-am-hiring",
+            Authorization: AUTHORIZATION,
             Accept: "application/json",
           },
         });
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
           setApiError(true);
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
         const data = await response.json();
@@ -201,14 +202,14 @@ export const TableDetections = (): ReactElement => {
 
   return (
     <div>
-      <h1>Table Detections</h1>
+      <h1>Detections Table</h1>
       <div className="flex flex-row">
-        <div>
+        <div className="text-sm w-[300px]">
           <div className="form-control self-center">
             <input
               type="text"
               placeholder="Search"
-              className="input input-bordered w-24 md:w-auto"
+              className="input input-bordered w-24 md:w-auto text-base"
               value={searchString}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setSearchString(e.target.value)
@@ -216,12 +217,10 @@ export const TableDetections = (): ReactElement => {
             />
           </div>
           <div>
-            <div>
-              <h3>Status </h3>
-            </div>
+            <h3>Status</h3>
             <div id="status-filter" className="m-2 flex flex-col">
               {DETECTIONS_STATUS_OPTIONS.map((item) => (
-                <div key={item}>
+                <label key={item}>
                   {" "}
                   <input
                     type="checkbox"
@@ -229,21 +228,20 @@ export const TableDetections = (): ReactElement => {
                     checked={detectionStatusFilter[item]}
                     onChange={() => onChangeStatusFilter(item)}
                   />
-                  <label htmlFor={`${item}`} className="mr-2">
-                    {`${item}`}
-                  </label>
-                </div>
+                  <span className="mr-2">{`${item}`}</span>
+                </label>
               ))}
             </div>
           </div>
+
           <div>
             <div>
-              <h3>Resoluton Status</h3>
+              <h3>Resolution Status</h3>
             </div>
             <div id="status-resolution-filter" className="m-2 flex flex-col">
               {" "}
               {DETECTIONS_RESOLUTION_STATUS_OPTIONS.map((item) => (
-                <div key={item}>
+                <label key={item}>
                   {" "}
                   <input
                     type="checkbox"
@@ -251,20 +249,19 @@ export const TableDetections = (): ReactElement => {
                     checked={detectionResolutionStatusFilter[item]}
                     onChange={() => onChangeStatusResolutionFilter(item)}
                   />
-                  <label htmlFor={`${item}`} className="mr-2">
-                    {`${item}`}
-                  </label>
-                </div>
+                  <span className="mr-2">{`${item}`}</span>
+                </label>
               ))}
             </div>
           </div>
+
           <div>
             <div>
               <h3>Severity</h3>
             </div>
             <div id="severity-filter" className="m-2 flex flex-col">
               {DETECTIONS_SEVERITY_OPTIONS.map((item) => (
-                <div key={item}>
+                <label key={item}>
                   {" "}
                   <input
                     type="checkbox"
@@ -272,20 +269,18 @@ export const TableDetections = (): ReactElement => {
                     checked={detectionSeverityFilter[item]}
                     onChange={() => onChangeSeverityFilter(item)}
                   />
-                  <label htmlFor={`${item}`} className="mr-2">
-                    {`${item}`}
-                  </label>
-                </div>
+                  <span className="mr-2">{`${item}`}</span>
+                </label>
               ))}
             </div>
           </div>
           <div>
             <div>
-              <h3>Resoluton Status</h3>
+              <h3>Category Ref</h3>
             </div>
             <div id="category-ref-filter" className="m-2 flex flex-col">
               {DETECTIONS_CATEGORY_REF_OPTIONS.map((item) => (
-                <div key={item}>
+                <label key={item}>
                   {" "}
                   <input
                     type="checkbox"
@@ -293,10 +288,8 @@ export const TableDetections = (): ReactElement => {
                     checked={detectionCategoryRefFilter[item]}
                     onChange={() => onChangeCategoryRefFilter(item)}
                   />
-                  <label htmlFor={`${item}`} className="mr-2">
-                    {`${item}`}
-                  </label>
-                </div>
+                  <span className="mr-2">{`${item}`}</span>
+                </label>
               ))}
             </div>
           </div>
