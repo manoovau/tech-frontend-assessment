@@ -58,7 +58,9 @@ test.describe("Detections Table", () => {
       }
 
       expect(
-        page.getByRole("heading", { name: "Status", exact: true }).isVisible()
+        await page
+          .getByRole("heading", { name: "Status", exact: true })
+          .isVisible()
       );
     });
   });
@@ -101,7 +103,7 @@ test.describe("Detections Table", () => {
       }
 
       expect(
-        page
+        await page
           .getByRole("heading", { name: "Resolution Status", exact: true })
           .isVisible()
       );
@@ -145,7 +147,9 @@ test.describe("Detections Table", () => {
       }
 
       expect(
-        page.getByRole("heading", { name: "Severity", exact: true }).isVisible()
+        await page
+          .getByRole("heading", { name: "Severity", exact: true })
+          .isVisible()
       );
     });
   });
@@ -203,7 +207,7 @@ test.describe("Detections Table", () => {
       }
 
       expect(
-        page
+        await page
           .getByRole("heading", { name: "Category Ref", exact: true })
           .isVisible()
       );

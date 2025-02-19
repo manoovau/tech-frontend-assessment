@@ -43,7 +43,7 @@ export const TableDetections = (): ReactElement => {
   const T_HEAD = [
     "Eyed",
     "Status",
-    `Resolution Status`,
+    "Resolution Status",
     "Service",
     "Title",
     "Severity",
@@ -202,154 +202,179 @@ export const TableDetections = (): ReactElement => {
 
   return (
     <div>
-      <h1>Detections Table</h1>
+      <div className="flex flex-row my-4">
+        <h1 className="text-3xl ">Detections Table</h1>
+        <div className="w-[400px] text-center pt-3">
+          {apiResponse.length === 0 && !apiError ? (
+            <h3>Loading ....</h3>
+          ) : (
+            apiError && apiResponse.length === 0 && <h3>Mock API</h3>
+          )}
+        </div>
+      </div>
       <div className="flex flex-row">
         <div className="text-sm w-[300px]">
-          <div className="form-control self-center">
-            <input
-              type="text"
-              placeholder="Search"
-              className="input input-bordered w-24 md:w-auto text-base"
-              value={searchString}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setSearchString(e.target.value)
-              }
-            />
-          </div>
-          <div>
-            <h3>Status</h3>
-            <div id="status-filter" className="m-2 flex flex-col">
-              {DETECTIONS_STATUS_OPTIONS.map((item) => (
-                <label key={item}>
-                  {" "}
-                  <input
-                    type="checkbox"
-                    className="mr-2"
-                    checked={detectionStatusFilter[item]}
-                    onChange={() => onChangeStatusFilter(item)}
-                  />
-                  <span className="mr-2">{`${item}`}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div>
-              <h3>Resolution Status</h3>
-            </div>
-            <div id="status-resolution-filter" className="m-2 flex flex-col">
-              {" "}
-              {DETECTIONS_RESOLUTION_STATUS_OPTIONS.map((item) => (
-                <label key={item}>
-                  {" "}
-                  <input
-                    type="checkbox"
-                    className="mr-2"
-                    checked={detectionResolutionStatusFilter[item]}
-                    onChange={() => onChangeStatusResolutionFilter(item)}
-                  />
-                  <span className="mr-2">{`${item}`}</span>
-                </label>
-              ))}
-            </div>
+          <div className="form-control self-center m-4 border-none">
+            <label className="input ">
+              <svg
+                className="h-[1em] opacity-50"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <g
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                  strokeWidth="2.5"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.3-4.3"></path>
+                </g>
+              </svg>
+              <input
+                type="text"
+                placeholder="Search"
+                className="input input-bordered w-24 md:w-auto text-base focus:outline-none"
+                value={searchString}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setSearchString(e.target.value)
+                }
+              />
+            </label>
           </div>
 
-          <div>
-            <div>
-              <h3>Severity</h3>
-            </div>
-            <div id="severity-filter" className="m-2 flex flex-col">
-              {DETECTIONS_SEVERITY_OPTIONS.map((item) => (
-                <label key={item}>
-                  {" "}
-                  <input
-                    type="checkbox"
-                    className="mr-2"
-                    checked={detectionSeverityFilter[item]}
-                    onChange={() => onChangeSeverityFilter(item)}
-                  />
-                  <span className="mr-2">{`${item}`}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-          <div>
-            <div>
-              <h3>Category Ref</h3>
-            </div>
-            <div id="category-ref-filter" className="m-2 flex flex-col">
-              {DETECTIONS_CATEGORY_REF_OPTIONS.map((item) => (
-                <label key={item}>
-                  {" "}
-                  <input
-                    type="checkbox"
-                    className="mr-2"
-                    checked={detectionCategoryRefFilter[item]}
-                    onChange={() => onChangeCategoryRefFilter(item)}
-                  />
-                  <span className="mr-2">{`${item}`}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+          <ul className="menu bg-base-200 rounded-box w-70 text-[12px]">
+            <li>
+              <h3 className="menu-title">Status</h3>
+              <ul>
+                {DETECTIONS_STATUS_OPTIONS.map((item) => (
+                  <li key={item}>
+                    <label>
+                      {" "}
+                      <input
+                        type="checkbox"
+                        className="mr-2"
+                        checked={detectionStatusFilter[item]}
+                        onChange={() => onChangeStatusFilter(item)}
+                      />
+                      <span className="mr-2">{`${item}`}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </li>
+
+            <li>
+              <h3 className="menu-title">Resolution Status</h3>
+              <ul>
+                {DETECTIONS_RESOLUTION_STATUS_OPTIONS.map((item) => (
+                  <li key={item}>
+                    <label>
+                      {" "}
+                      <input
+                        type="checkbox"
+                        className="mr-2"
+                        checked={detectionResolutionStatusFilter[item]}
+                        onChange={() => onChangeStatusResolutionFilter(item)}
+                      />
+                      <span className="mr-2">{`${item}`}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </li>
+            <li>
+              <h3 className="menu-title">Severity</h3>
+              <ul>
+                {DETECTIONS_SEVERITY_OPTIONS.map((item) => (
+                  <li key={item}>
+                    <label>
+                      {" "}
+                      <input
+                        type="checkbox"
+                        className="mr-2"
+                        checked={detectionSeverityFilter[item]}
+                        onChange={() => onChangeSeverityFilter(item)}
+                      />
+                      <span className="mr-2">{`${item}`}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </li>
+
+            <li>
+              <h3 className="menu-title">Category Ref</h3>
+              <ul>
+                {DETECTIONS_CATEGORY_REF_OPTIONS.map((item) => (
+                  <li key={item}>
+                    <label>
+                      {" "}
+                      <input
+                        type="checkbox"
+                        className="mr-2"
+                        checked={detectionCategoryRefFilter[item]}
+                        onChange={() => onChangeCategoryRefFilter(item)}
+                      />
+                      <span className="mr-2">{`${item}`}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          </ul>
         </div>
-        <div className="overflow-x-auto border-1">
-          {apiResponse.length === 0 && !apiError && <h3>Loading ....</h3>}
-          {apiError && apiResponse.length === 0 && <h3>Mock API</h3>}
-          <table className="w-full border-collapse border border-gray-200 shadow-lg rounded-lg">
-            <thead className="bg-gray-100 text-gray-700 uppercase text-sm">
+
+        <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+          <table className="table">
+            <thead className="bg-gray-100 text-gray-700 uppercase text-sm text-wrap">
               <tr>
                 {T_HEAD.map((item) => (
-                  <th key={item} className="px-4 py-2 border">
-                    {item}
-                  </th>
+                  <th key={item}>{item}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="text-gray-600 text-sm">
               {result.map((item) => (
-                <tr
-                  key={item.id}
-                  className="border hover:bg-gray-50 even:bg-gray-50 transition-all"
-                >
-                  <td className="px-4 py-2 border">{item.eyed}</td>
-                  <td className="px-4 py-2 border">{item.status}</td>
-                  <td className="px-4 py-2 border">{item.resolutionStatus}</td>
-                  <td className="px-4 py-2 border">{item.service}</td>
-                  <td className="px-4 py-2 border">{item.title}</td>
-                  <td className="px-4 py-2 border">{item.severity}</td>
+                <tr key={item.id} className="hover:bg-base-300">
+                  <td>{item.eyed}</td>
+                  <td>{item.status}</td>
+                  <td>{item.resolutionStatus}</td>
+                  <td>{item.service}</td>
+                  <td>{item.title}</td>
+                  <td>{item.severity}</td>
                   {item?.createdAt ? (
-                    <td className="px-4 py-2 border">
+                    <td>
                       <DateELement
                         date={item?.createdAt}
                         isContactEmail={false}
                       />
                     </td>
                   ) : (
-                    <td className="px-4 py-2 border"></td>
+                    <td></td>
                   )}
                   {item?.updatedAt ? (
-                    <td className="px-4 py-2 border">
+                    <td>
                       <DateELement
                         date={item?.updatedAt}
                         isContactEmail={false}
                       />
                     </td>
                   ) : (
-                    <td className="px-4 py-2 border"></td>
+                    <td></td>
                   )}
                   {item?.triggeredAt ? (
-                    <td className="px-4 py-2 border">
+                    <td>
                       <DateELement
                         date={item?.triggeredAt}
                         isContactEmail={false}
                       />
                     </td>
                   ) : (
-                    <td className="px-4 py-2 border"></td>
+                    <td></td>
                   )}
-                  <td className="px-4 py-2 border">
+                  <td>
                     {item.acknowledgedAt && (
                       <DateELement
                         date={item?.acknowledgedAt}
@@ -359,7 +384,7 @@ export const TableDetections = (): ReactElement => {
                     )}
                   </td>
 
-                  <td className="px-4 py-2 border">
+                  <td>
                     {item.resolvedAt && (
                       <DateELement
                         date={item?.resolvedAt}
@@ -368,7 +393,7 @@ export const TableDetections = (): ReactElement => {
                       />
                     )}
                   </td>
-                  <td className="px-4 py-2 border">{item.categoryRef}</td>
+                  <td>{item.categoryRef}</td>
                 </tr>
               ))}
             </tbody>

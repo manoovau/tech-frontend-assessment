@@ -4,7 +4,7 @@ import { TableDetections } from "./components/TableDetections";
 
 function App(): ReactElement {
   return (
-    <div>
+    <div className="m-10 mb-14">
       <TableDetections />
     </div>
   );
